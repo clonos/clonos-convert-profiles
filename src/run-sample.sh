@@ -1,5 +1,7 @@
 #!/bin/sh
-[ ! -r main ] && rustc main.rs
+if [ ! -r main ]; then
+	rustc main.rs && strip main
+fi
 [ -z "${CIX_DISTDIR}" ] && CIX_DISTDIR="/usr/local/cbsd"
 [ -z "${CIX_BIN}" ] && CIX_BIN="/usr/local/bin/cbsd"
 
@@ -30,10 +32,14 @@ if [ -z "${PROFILES}" ]; then
 	exit 1
 fi
 
-env CIX_PROFILES="${PROFILES}" \
+env \
+CIX_PROFILES="${PROFILES}" \
+VM_CPUS_MIN=1 \
 VM_CPUS_MAX=12 \
+VM_RAM_MIN="1g" \
 VM_RAM_MAX="16g" \
 IMGSIZE_MAX="100g" \
+IMGSIZE_MIN="0" \
 CIX_PROFILES_DATA="cbsd_vdi_image,cbsd_vdi_user,cbsd_vdi_password,cbsd_vdi_proto,clonos_active,vm_profile,vm_os_type,long_description,default_jailname,imgsize:bytes,imgsize_min:bytes,vm_ram:bytes" \
 ./main -c "${CAPABILITIES}" -o ./out.php
 _ret=$?

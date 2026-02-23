@@ -270,13 +270,23 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Опциональные переменные окружения: VM_CPUS_MAX, VM_RAM_MAX, IMGSIZE_MAX
+    // Опциональные переменные окружения: VM_CPUS_MAX, VM_CPUS_MIN, VM_RAM_MAX, VM_RAM_MIN, IMGSIZE_MAX, IMGSIZE_MIN
     let vm_cpus_max: Option<String> = env::var("VM_CPUS_MAX").ok().map(|v| v.trim().to_string()).filter(|s| !s.is_empty());
+    let vm_cpus_min: Option<String> = env::var("VM_CPUS_MIN").ok().map(|v| v.trim().to_string()).filter(|s| !s.is_empty());
+
     let vm_ram_max: Option<String> = env::var("VM_RAM_MAX")
         .ok()
         .map(|v| human_to_bytes(v.trim()))
         .filter(|s| !s.is_empty());
+    let vm_ram_min: Option<String> = env::var("VM_RAM_MIN")
+        .ok()
+        .map(|v| human_to_bytes(v.trim()))
+        .filter(|s| !s.is_empty());
     let imgsize_max: Option<String> = env::var("IMGSIZE_MAX")
+        .ok()
+        .map(|v| human_to_bytes(v.trim()))
+        .filter(|s| !s.is_empty());
+    let imgsize_min: Option<String> = env::var("IMGSIZE_MIN")
         .ok()
         .map(|v| human_to_bytes(v.trim()))
         .filter(|s| !s.is_empty());
@@ -376,13 +386,28 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        if let Some(ref v) = vm_cpus_min {
+            if writeln!(file, "\t\t\"vm_cpus_min\"=>\"{}\",", php_escape(v)).is_err() {
+                std::process::exit(1);
+            }
+        }
         if let Some(ref v) = vm_ram_max {
             if writeln!(file, "\t\t\"vm_ram_max\"=>\"{}\",", php_escape(v)).is_err() {
                 std::process::exit(1);
             }
         }
+        if let Some(ref v) = vm_ram_min {
+            if writeln!(file, "\t\t\"vm_ram_min\"=>\"{}\",", php_escape(v)).is_err() {
+                std::process::exit(1);
+            }
+        }
         if let Some(ref v) = imgsize_max {
             if writeln!(file, "\t\t\"imgsize_max\"=>\"{}\",", php_escape(v)).is_err() {
+                std::process::exit(1);
+            }
+        }
+        if let Some(ref v) = imgsize_min {
+            if writeln!(file, "\t\t\"imgsize_min\"=>\"{}\",", php_escape(v)).is_err() {
                 std::process::exit(1);
             }
         }
